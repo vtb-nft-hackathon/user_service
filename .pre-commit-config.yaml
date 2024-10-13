@@ -1,0 +1,34 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args:
+          - --fix
+        stages:
+          - commit
+
+      - id: ruff-format
+        stages:
+          - commit
+
+      - id: ruff
+        name: ruff-check
+        stages:
+          - manual
+
+      - id: ruff-format
+        name: ruff-format-check
+        args:
+          - --diff
+        stages:
+          - manual
+
+# disable, cause errors
+#  - repo: local
+#    hooks:
+#      - id: mypy
+#        name: mypy
+#        language: docker_image
+#        entry: skeletor-api mypy .
+#        pass_filenames: false

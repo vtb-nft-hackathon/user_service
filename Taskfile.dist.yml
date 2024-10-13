@@ -1,0 +1,35 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  submodules:
+    desc: Обновление сабмодулей проекта
+    cmd: git submodule update --init --recursive
+
+  lint:
+    desc: Проверка кода линтером и форматтером (без внесения исправлений)
+    cmd: pre-commit run --all-files --hook-stage manual
+
+  fix:
+    desc: Исправление кода линтером и форматирование
+    cmds:
+      - cmd: pre-commit run --all-files --hook-stage commit ruff
+        ignore_error: true
+      - pre-commit run --all-files --hook-stage commit ruff-format
+
+  mypy:
+    desc: Проверка тайп-хинтов
+    cmd: pre-commit run mypy
+
+  test:
+    desc: Запуск тестов в Docker-контейнере
+    summary: |
+      Запускает все тесты в контейнере. Команда для запуска тестов может принимать доп. аргументы, например:
+      `task test -- tests/api/v1`.
+    cmd:
+      docker compose run
+      --rm
+      -e DB__DSN=postgresql://user:password@pg:5432/skeletor_test
+      api
+      pytest -v --random-order {{.CLI_ARGS}}

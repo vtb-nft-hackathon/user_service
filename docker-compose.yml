@@ -1,0 +1,102 @@
+version: "3.3"
+
+services:
+  api:
+    build:
+      dockerfile: Dockerfile-test
+    environment:
+      DEBUG: true
+    command: ["python", "main.py", "run-api"]
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+#      rmq:
+#        condition: service_healthy
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./:/code
+    healthcheck:
+      test: curl localhost:8000/technical/ping
+      interval: 3s
+      timeout: 2s
+      retries: 3
+
+#  assign-large-account:
+#    build:
+#      dockerfile: Dockerfile-test
+#    environment:
+#      DEBUG: true
+#    command: ["python", "main.py", "run-assign-large-account"]
+#    # Не всегда успевает подключиться к брокеру на старте.
+#    restart: on-failure:3
+#    depends_on:
+#      migrations:
+#        condition: service_completed_successfully
+#      rmq:
+#        condition: service_healthy
+#    volumes:
+#      - ./:/code
+
+#  jaw-cron:
+#    build:
+#      dockerfile: Dockerfile-test
+#    environment:
+#      DEBUG: true
+#    command: ["python", "main.py", "run-jaw-cron"]
+#    depends_on:
+#      migrations:
+#        condition: service_completed_successfully
+#      rmq:
+#        condition: service_healthy
+#    volumes:
+#      - ./:/code
+
+  pg:
+    image: postgres:14.5-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: skeletor
+    ports:
+      - "${PG_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U user -d skeletor
+      interval: 2s
+      timeout: 1s
+      retries: 10
+
+#  rmq:
+#    image: rabbitmq:3.8.19-management-alpine
+#    environment:
+#      RABBITMQ_DEFAULT_USER: user
+#      RABBITMQ_DEFAULT_PASS: password
+#      RABBITMQ_DEFAULT_VHOST: skeletor
+#    ports:
+#      - "${RMQ_MGMT_PORT:-15672}:15672"
+#      - "${RMQ_PORT:-5672}:5672"
+#    healthcheck:
+#      test: rabbitmq-diagnostics -q ping
+#      interval: 2s
+#      timeout: 1s
+#      retries: 10
+
+  migrations:
+    build:
+      dockerfile: Dockerfile-test
+    command: ["python", "migrate.py"]
+    environment:
+      DB_URL: postgres://user:password@pg:5432/skeletor
+    # Сервис pg может стать healthy, но затем перезагрузиться после выполнения инициализации,
+    # а затем снова выздороветь. Это происходит только при первом запуске.
+    restart: on-failure:10
+    depends_on:
+      pg:
+        condition: service_healthy
+    volumes:
+      - ./:/code
+
+volumes:
+  pgdata:

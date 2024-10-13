@@ -1,0 +1,73 @@
+[project]
+name = "skeletor"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+strict = true
+exclude = [
+    ".*venv",
+    ".*-db"
+]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.ruff]
+line-length = 120
+exclude = ["*-db"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    # Missing docstrings
+    "D1",
+    # Type annotated self, cls
+    "ANN",
+    # Blank line before class body
+    "D203",
+    # Docstring start on first line
+    "D212",
+    # Russian symbols
+    "RUF001",
+    "RUF002",
+    "RUF003",
+    # Global binding
+    "S104",
+    # String in Exception
+    "EM101",
+    # Builtin open usage
+    "PTH123",
+    # Long exception messages
+    "TRY003",
+    # Too many positional arguments
+    "PLR0913",
+    # Unused argument
+    "ARG001",
+    "ARG002",
+    # for loop argument re-define
+    "PLW2901",
+    # Boolean arguments
+    "FBT001",
+    "FBT002",
+    # Format options, handled by ruff format
+    "COM812",
+    "ISC001",
+    # Import alias does not rename original package
+    "PLC0414",
+]
+
+[tool.ruff.lint.isort]
+order-by-type = false
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    # Use of assert
+    "S101"
+]
