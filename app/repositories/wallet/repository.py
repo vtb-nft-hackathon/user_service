@@ -9,4 +9,5 @@ class WalletRepository:
         self.pool = pool
 
     async def register_wallet(self) -> None:
-        self.blockchain.eth
+        account = self.blockchain.eth.account.create()
+

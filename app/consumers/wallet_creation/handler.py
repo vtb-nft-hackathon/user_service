@@ -13,10 +13,10 @@ async def handle_event(event: UserRegistration, wallet_repository: FromDishka[Wa
 
 
 def create_subscriber(config: Config) -> ConsumerFactoryReturnType:
-    broker = RabbitBroker(config.brokers.skeletor.url)
+    broker = RabbitBroker(config.brokers.users.url)
 
-    exchange = RabbitExchange(**config.brokers.skeletor.subscribers.new_bone.exchange.model_dump())
-    queue = RabbitQueue(**config.brokers.skeletor.subscribers.new_bone.queue.model_dump())
+    exchange = RabbitExchange(**config.brokers.users.subscribers.wallet_registration.exchange.model_dump())
+    queue = RabbitQueue(**config.brokers.skeletor.subscribers.wallet_registration.queue.model_dump())
 
     consumer_wrapper = broker.subscriber(queue=queue, exchange=exchange)(handle_event)
     return broker, exchange, queue, consumer_wrapper

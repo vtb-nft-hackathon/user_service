@@ -27,7 +27,7 @@ services:
       dockerfile: Dockerfile-test
     environment:
       DEBUG: true
-    command: ["python", "main.py", "run-assign-large-account"]
+    command: ["python", "main.py", "run-wallet-registration"]
     # Не всегда успевает подключиться к брокеру на старте.
     restart: on-failure:3
     depends_on:
