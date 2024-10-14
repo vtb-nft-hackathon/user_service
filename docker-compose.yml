@@ -16,11 +16,11 @@ services:
       - "${API_PORT:-8000}:8000"
     volumes:
       - ./:/code
-    healthcheck:
-      test: curl localhost:8000/technical/ping
-      interval: 3s
-      timeout: 2s
-      retries: 3
+#    healthcheck:
+#      test: curl localhost:8000/technical/ping
+#      interval: 3s
+#      timeout: 2s
+#      retries: 3
 
 #  assign-large-account:
 #    build:
@@ -62,11 +62,11 @@ services:
       - "${PG_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: pg_isready -U user -d skeletor
-      interval: 2s
-      timeout: 1s
-      retries: 10
+#    healthcheck:
+#      test: pg_isready -U user -d skeletor
+#      interval: 2s
+#      timeout: 1s
+#      retries: 10
 
 #  rmq:
 #    image: rabbitmq:3.8.19-management-alpine

@@ -1,7 +1,7 @@
 from httpx import AsyncClient
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED
 
-from app.common.models import BoneBase, BoneCreate, BoneKind
+from app.common.bone import BoneBase, BoneCreate, BoneKind
 from app.repositories import BonesRepository
 
 

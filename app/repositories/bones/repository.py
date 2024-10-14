@@ -1,4 +1,4 @@
-from app.common.models import Bone, BoneBase
+from app.common.bone import Bone, BoneBase
 from app.core.database import Pool
 from app.repositories.bones.queries import ADD_BONE, GET_BONE_BY_ID
 

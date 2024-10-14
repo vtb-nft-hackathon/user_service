@@ -1,8 +1,8 @@
 from faststream.rabbit import TestRabbitBroker
 from respx import MockRouter
 
+from app.common.bone import BoneBase, BoneKind
 from app.common.events import NewBone
-from app.common.models import BoneBase, BoneKind
 from app.consumers.types import ConsumerFactoryReturnType
 from app.repositories import BonesRepository
 

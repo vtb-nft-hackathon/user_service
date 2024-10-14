@@ -1,8 +1,8 @@
 from dishka.entities.depends_marker import FromDishka
 from faststream.rabbit import RabbitBroker, RabbitExchange, RabbitQueue
 
+from app.common.bone import BoneKind
 from app.common.events import NewBone
-from app.common.models import BoneKind
 from app.consumers.types import ConsumerFactoryReturnType
 from app.core.settings import Config
 from app.repositories import BonesRepository

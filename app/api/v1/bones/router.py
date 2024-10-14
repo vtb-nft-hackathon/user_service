@@ -5,8 +5,8 @@ from starlette import status
 
 from app.api.exceptions import NotFoundError
 from app.api.responses import ErrorMessage, ErrorResponse, GeneralResponse, SuccessResponse, ValidationError
+from app.common.bone import Bone, BoneCreate
 from app.common.events import NewBone
-from app.common.models import Bone, BoneCreate
 from app.core.di.types import BonesPublisher
 from app.repositories import BonesRepository
 
