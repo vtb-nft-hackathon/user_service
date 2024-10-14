@@ -121,3 +121,4 @@ class Config(BaseSettings):
     clients: ClientsSettings = ClientsSettings()
     brokers: BrokersSettings = BrokersSettings()
     web3: Web3Settings = Web3Settings()
+    master_key: bytes = b"89w8fiuwupn3ux6vuedcfdzqavr99lmn"

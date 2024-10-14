@@ -1,6 +1,8 @@
 from collections.abc import AsyncIterator
 from typing import cast
 
+from Crypto.Cipher import AES
+from Crypto.Cipher._mode_cbc import CbcMode
 from dishka import provide, Provider, Scope
 from faststream.rabbit import RabbitBroker, RabbitExchange
 from web3 import AsyncWeb3, AsyncHTTPProvider
@@ -9,6 +11,7 @@ from app.core.database import Connection, create_pool, Pool
 from app.core.di.types import UserEventsPublisher, UserEventsExchange, UserServiceBroker
 from app.core.settings import Config
 from app.repositories import WalletRepository
+from app.repositories.organizations.repository import OrganizationRepository
 from app.repositories.user.repository import UserRepository
 
 
@@ -26,7 +29,7 @@ class DefaultProvider(Provider):
             max_inactive_connection_lifetime=config.db.max_inactive_connection_lifetime,
             config=config.db,
             tag="master",
-            application_name="skeletor",
+            application_name="users-service",
         )
         yield pool
         await pool.close()
@@ -37,6 +40,13 @@ class DefaultProvider(Provider):
         yield cast(Connection, await acquire_context.__aenter__())
         await acquire_context.__aexit__()
 
+    @provide(scope=Scope.APP)
+    async def get_async_web3(self, config: Config) -> AsyncWeb3:
+        return AsyncWeb3(AsyncHTTPProvider(config.web3.rpc_url))
+
+    @provide(scope=Scope.APP)
+    async def get_aes(self, config: Config) -> CbcMode:
+        return AES.new(config.master_key, AES.MODE_CBC)
 
 class RabbitProvider(Provider):
     @provide(scope=Scope.APP)
@@ -62,9 +72,6 @@ class RabbitProvider(Provider):
 
 
 class RepositoryProvider(Provider):
-    @provide(scope=Scope.APP)
-    async def get_async_web3(self, config: Config) -> AsyncWeb3:
-        return AsyncWeb3(AsyncHTTPProvider(config.web3.rpc_url))
-
     wallet_repository = provide(WalletRepository, scope=Scope.REQUEST)
     user_repository = provide(UserRepository, scope=Scope.REQUEST)
+    organization_repository = provide(OrganizationRepository, scope=Scope.REQUEST)
