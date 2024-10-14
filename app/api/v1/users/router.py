@@ -6,7 +6,7 @@ from starlette import status
 from app.api.exceptions import NotFoundError
 from app.api.responses import ErrorMessage, ErrorResponse, GeneralResponse, SuccessResponse, ValidationError
 from app.common.events import UserRegistration
-from app.common.models import User
+from app.common.models_temp import User
 from app.core.di.types import UserEventsPublisher
 from app.repositories import WalletRepository
 from app.repositories.user.repository import UserRepository
@@ -24,7 +24,7 @@ users_router = APIRouter(
     summary="Получить кость по ID",
     description="Возвращает информацию о кости по ее ID.",
     responses={
-        status.HTTP_200_OK: {"description": "Кость с указанным ID.", "model": SuccessResponse[Bone]},
+        status.HTTP_200_OK: {"description": "Кость с указанным ID.", "model": SuccessResponse[User]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "description": "Ошибка валидации.",
             "model": ErrorResponse[ValidationError],
@@ -35,7 +35,7 @@ users_router = APIRouter(
         },
     },
 )
-async def get_bone(bone_id: int, bone_repository: FromDishka[WalletRepository]) -> Bone:
+async def get_bone(bone_id: int, bone_repository: FromDishka[WalletRepository]) -> User:
     bone = await bone_repository.get_by_id(bone_id)
 
     if not bone:
