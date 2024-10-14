@@ -40,7 +40,7 @@ def config() -> Config:
 
 @pytest.fixture(scope="session")
 def database_migrations_dir(config: Config) -> Path:
-    return Path(__file__).parent.parent / "skeletor-db" / "migrations"
+    return Path(__file__).parent.parent / "users-db" / "migrations"
 
 
 @pytest.fixture(scope="session")
