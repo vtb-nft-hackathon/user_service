@@ -8,8 +8,7 @@ from app.repositories import WalletRepository
 
 
 async def handle_event(event: UserRegistration, wallet_repository: FromDishka[WalletRepository]) -> None:
-    bone = await wallet_repository.register_wallet()
-
+    await wallet_repository.register_wallet(event.user_id)
 
 
 def create_subscriber(config: Config) -> ConsumerFactoryReturnType:

@@ -6,10 +6,11 @@ from starlette import status
 from app.api.exceptions import NotFoundError
 from app.api.responses import ErrorMessage, ErrorResponse, GeneralResponse, SuccessResponse, ValidationError
 from app.common.events import UserRegistration
-from app.core.di.types import BonesPublisher
+from app.common.models import Bone, BoneCreate
+from app.core.di.types import UserEventsPublisher
 from app.repositories import WalletRepository
 
-bones_router = APIRouter(
+users_router = APIRouter(
     default_response_class=GeneralResponse,
     prefix="/wallet",
     tags=["bone"],
@@ -17,7 +18,7 @@ bones_router = APIRouter(
 )
 
 
-@bones_router.get(
+@users_router.get(
     path="/{bone_id}",
     summary="Получить кость по ID",
     description="Возвращает информацию о кости по ее ID.",
@@ -42,7 +43,7 @@ async def get_bone(bone_id: int, bone_repository: FromDishka[WalletRepository]) 
     return bone
 
 
-@bones_router.post(
+@users_router.post(
     path="",
     response_model=Bone,
     summary="Создать кость",
@@ -59,10 +60,10 @@ async def get_bone(bone_id: int, bone_repository: FromDishka[WalletRepository]) 
 async def create_bone(
     bone_create: BoneCreate,
     bone_repository: FromDishka[WalletRepository],
-    publisher: FromDishka[BonesPublisher],
+    publisher: FromDishka[UserEventsPublisher],
 ) -> Bone:
     bone = await bone_repository.add(bone_create)
 
     event = UserRegistration(bone_id=bone.id)
-    await publisher.publish(event, routing_key="v1.event.created")
+    await publisher.publish(event, routing_key="v1.event.registration")
     return bone

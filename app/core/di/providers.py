@@ -6,9 +6,10 @@ from faststream.rabbit import RabbitBroker, RabbitExchange
 from web3 import AsyncWeb3, AsyncHTTPProvider
 
 from app.core.database import Connection, create_pool, Pool
-from app.core.di.types import BonesPublisher, SkeletorBonesExchange, SkeletorBroker
+from app.core.di.types import UserEventsPublisher, UserEventsExchange, UserServiceBroker
 from app.core.settings import Config
 from app.repositories import WalletRepository
+from app.repositories.user.repository import UserRepository
 
 
 class DefaultProvider(Provider):
@@ -39,25 +40,25 @@ class DefaultProvider(Provider):
 
 class RabbitProvider(Provider):
     @provide(scope=Scope.APP)
-    async def get_skeletor_broker(self, config: Config) -> AsyncIterator[SkeletorBroker]:
+    async def get_users_broker(self, config: Config) -> AsyncIterator[UserServiceBroker]:
         # Per VHost broker
-        broker = RabbitBroker(url=config.brokers.skeletor.url)
+        broker = RabbitBroker(url=config.brokers.users.url)
         await broker.start()
 
-        yield SkeletorBroker(broker)
+        yield UserServiceBroker(broker)
 
         await broker.close()
 
     @provide(scope=Scope.APP)
-    async def get_skeletor_bones_exchange(self, broker: SkeletorBroker, config: Config) -> SkeletorBonesExchange:
-        exchange = RabbitExchange(**config.brokers.skeletor.publishers.bones.model_dump())
+    async def get_user_events_exchange(self, broker: UserServiceBroker, config: Config) -> UserEventsExchange:
+        exchange = RabbitExchange(**config.brokers.users.publishers.users.model_dump())
         await broker.declare_exchange(exchange)
-        return SkeletorBonesExchange(exchange)
+        return UserEventsExchange(exchange)
 
     @provide(scope=Scope.APP)
-    async def get_bones_publisher(self, broker: SkeletorBroker, exchange: SkeletorBonesExchange) -> BonesPublisher:
+    async def get_user_publisher(self, broker: UserServiceBroker, exchange: UserEventsExchange) -> UserEventsPublisher:
         publisher = broker.publisher(exchange=exchange)
-        return BonesPublisher(publisher)
+        return UserEventsPublisher(publisher)
 
 
 class RepositoryProvider(Provider):
@@ -66,3 +67,4 @@ class RepositoryProvider(Provider):
         return AsyncWeb3(AsyncHTTPProvider(config.web3.rpc_url))
 
     wallet_repository = provide(WalletRepository, scope=Scope.REQUEST)
+    user_repository = provide(UserRepository, scope=Scope.REQUEST)
