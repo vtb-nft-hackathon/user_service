@@ -74,13 +74,13 @@ class SubscriberSettings(BaseModel):
 
 
 class SkeletorPublishersSettings(BaseModel):
-    bones: ExchangeSettings = ExchangeSettings(name="skeletor.bones")
+    bones: ExchangeSettings = ExchangeSettings(name="skeletor.wallet")
 
 
 class SkeletorSubscribersSettings(BaseModel):
     new_bone: SubscriberSettings = SubscriberSettings(
-        exchange=ExchangeSettings(name="skeletor.bones"),
-        queue=QueueSettings(name="skeletor.bones.event_created", routing_key="v1.event.created"),
+        exchange=ExchangeSettings(name="skeletor.wallet"),
+        queue=QueueSettings(name="skeletor.wallet.event_created", routing_key="v1.event.created"),
     )
 
 
@@ -119,6 +119,10 @@ class SentrySettings(BaseModel):
     dsn: str = ""
 
 
+class Web3Settings(BaseModel):
+    rpc_url: str = "https://arbitrum-sepolia.infura.io/v3/2a852b2d2c174a81ac0d904de44d2aa1"
+
+
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
         env_nested_delimiter="__",
@@ -136,3 +140,4 @@ class Config(BaseSettings):
     db: DatabaseSettings = DatabaseSettings()
     clients: ClientsSettings = ClientsSettings()
     brokers: BrokersSettings = BrokersSettings()
+    web3: Web3Settings = Web3Settings()

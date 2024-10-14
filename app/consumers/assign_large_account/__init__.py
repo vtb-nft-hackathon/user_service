@@ -1,1 +1,0 @@
-from app.consumers.assign_large_account.handler import create_subscriber as create_subscriber

@@ -1,21 +1,15 @@
 from dishka.entities.depends_marker import FromDishka
 from faststream.rabbit import RabbitBroker, RabbitExchange, RabbitQueue
 
-from app.common.bone import BoneKind
-from app.common.events import NewBone
+from app.common.events import UserRegistration
 from app.consumers.types import ConsumerFactoryReturnType
 from app.core.settings import Config
-from app.repositories import BonesRepository
+from app.repositories import WalletRepository
 
 
-async def handle_event(event: NewBone, bones_repository: FromDishka[BonesRepository]) -> None:
-    bone = await bones_repository.get_by_id(event.bone_id)
+async def handle_event(event: UserRegistration, wallet_repository: FromDishka[WalletRepository]) -> None:
+    bone = await wallet_repository.register_wallet()
 
-    if not bone:
-        return
-
-    if bone.kind == BoneKind.SKULL and bone.is_large:
-        raise NotImplementedError
 
 
 def create_subscriber(config: Config) -> ConsumerFactoryReturnType:

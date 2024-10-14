@@ -3,11 +3,12 @@ from typing import cast
 
 from dishka import provide, Provider, Scope
 from faststream.rabbit import RabbitBroker, RabbitExchange
+from web3 import AsyncWeb3, AsyncHTTPProvider
 
 from app.core.database import Connection, create_pool, Pool
 from app.core.di.types import BonesPublisher, SkeletorBonesExchange, SkeletorBroker
 from app.core.settings import Config
-from app.repositories import BonesRepository
+from app.repositories import WalletRepository
 
 
 class DefaultProvider(Provider):
@@ -60,6 +61,8 @@ class RabbitProvider(Provider):
 
 
 class RepositoryProvider(Provider):
-    @provide(scope=Scope.SESSION)
-    async def get_bones_provider(self, pool: Pool) -> BonesRepository:
-        return BonesRepository(pool)
+    @provide(scope=Scope.APP)
+    async def get_async_web3(self, config: Config) -> AsyncWeb3:
+        return AsyncWeb3(AsyncHTTPProvider(config.web3.rpc_url))
+
+    wallet_repository = provide(WalletRepository, scope=Scope.REQUEST)

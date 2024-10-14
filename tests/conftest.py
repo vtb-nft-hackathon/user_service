@@ -19,7 +19,7 @@ from app.consumers.types import ConsumerFactoryReturnType
 from app.core.database import Pool
 from app.core.di.providers import DefaultProvider, RabbitProvider, RepositoryProvider
 from app.core.settings import Config
-from app.repositories import BonesRepository
+from app.repositories import WalletRepository
 
 
 class TestError(Exception):
@@ -201,7 +201,7 @@ async def assign_large_account_consumer(
     config: Config,
     container: AsyncContainer,
 ) -> ConsumerFactoryReturnType:
-    from app.consumers.assign_large_account import create_subscriber
+    from app.consumers.wallet_creation import create_subscriber
 
     broker, exchange, queue, handler = create_subscriber(config)
     app = FastStream(broker)
@@ -210,9 +210,9 @@ async def assign_large_account_consumer(
 
 
 @pytest.fixture
-async def bones_repository(container: AsyncContainer) -> AsyncIterator[BonesRepository]:
+async def bones_repository(container: AsyncContainer) -> AsyncIterator[WalletRepository]:
     async with container() as request_container:
-        yield await request_container.get(BonesRepository)
+        yield await request_container.get(WalletRepository)
 
 
 @pytest.fixture
