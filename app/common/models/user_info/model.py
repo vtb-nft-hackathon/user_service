@@ -10,6 +10,7 @@ from app.common.models.user_study.model import UserStudyDomain
 
 
 class UserInfoBase(BaseModel):
+    id: int
     first_name: str
     last_name: str
     third_name: str | None
