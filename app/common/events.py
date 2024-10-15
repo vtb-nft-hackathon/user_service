@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
 
-class NewBone(BaseModel):
-    bone_id: int
+class UserRegistration(BaseModel):
+    user_id: int

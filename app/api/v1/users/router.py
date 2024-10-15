@@ -5,25 +5,26 @@ from starlette import status
 
 from app.api.exceptions import NotFoundError
 from app.api.responses import ErrorMessage, ErrorResponse, GeneralResponse, SuccessResponse, ValidationError
-from app.common.bone import Bone, BoneCreate
-from app.common.events import NewBone
-from app.core.di.types import BonesPublisher
-from app.repositories import BonesRepository
+from app.common.events import UserRegistration
+from app.common.models_temp import User
+from app.core.di.types import UserEventsPublisher
+from app.repositories import WalletRepository
+from app.repositories.user.repository import UserRepository
 
-bones_router = APIRouter(
+users_router = APIRouter(
     default_response_class=GeneralResponse,
-    prefix="/bones",
+    prefix="/wallet",
     tags=["bone"],
     route_class=DishkaRoute,
 )
 
 
-@bones_router.get(
+@users_router.get(
     path="/{bone_id}",
     summary="Получить кость по ID",
     description="Возвращает информацию о кости по ее ID.",
     responses={
-        status.HTTP_200_OK: {"description": "Кость с указанным ID.", "model": SuccessResponse[Bone]},
+        status.HTTP_200_OK: {"description": "Кость с указанным ID.", "model": SuccessResponse[User]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "description": "Ошибка валидации.",
             "model": ErrorResponse[ValidationError],
@@ -34,7 +35,7 @@ bones_router = APIRouter(
         },
     },
 )
-async def get_bone(bone_id: int, bone_repository: FromDishka[BonesRepository]) -> Bone:
+async def get_bone(bone_id: int, bone_repository: FromDishka[WalletRepository]) -> User:
     bone = await bone_repository.get_by_id(bone_id)
 
     if not bone:
@@ -43,27 +44,27 @@ async def get_bone(bone_id: int, bone_repository: FromDishka[BonesRepository]) -
     return bone
 
 
-@bones_router.post(
+@users_router.post(
     path="",
-    response_model=Bone,
-    summary="Создать кость",
+    response_model=User,
+    summary="Создать кость",  # TODO: descriptions swagger
     description="Создает кость указанного типа.",
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"description": "Созданная кость.", "model": SuccessResponse[Bone]},
+        status.HTTP_201_CREATED: {"description": "Созданная кость.", "model": SuccessResponse[User]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "description": "Ошибка валидации.",
             "model": ErrorResponse[ValidationError],
         },
     },
 )
-async def create_bone(
-    bone_create: BoneCreate,
-    bone_repository: FromDishka[BonesRepository],
-    publisher: FromDishka[BonesPublisher],
-) -> Bone:
-    bone = await bone_repository.add(bone_create)
+async def register(
+    payload: User,
+    user_repository: FromDishka[UserRepository],
+    publisher: FromDishka[UserEventsPublisher],
+) -> User:
+    user = await user_repository.create_user(payload.name)
 
-    event = NewBone(bone_id=bone.id)
-    await publisher.publish(event, routing_key="v1.event.created")
-    return bone
+    event = UserRegistration(user_id=user.id)
+    await publisher.publish(event, routing_key="v1.event.registration")
+    return user

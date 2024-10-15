@@ -1,1 +1,1 @@
-from app.repositories.bones.repository import BonesRepository as BonesRepository
+from app.repositories.wallet.repository import WalletRepository

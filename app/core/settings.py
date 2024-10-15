@@ -24,20 +24,6 @@ class ApiSettings(BaseModel):
         return address
 
 
-class MetricsServerSettings(BaseModel):
-    host: str = "0.0.0.0"
-    port: int = 18000
-    path: str = "/technical/metrics"
-
-    @classmethod
-    @field_validator("path")
-    def ensure_slash(cls, value: str) -> str:
-        if not value.startswith("/"):
-            value = f"/{value}"
-
-        return value
-
-
 class ExternalServiceClientSettings(BaseModel):
     base_url: AnyHttpUrlStr = "http://alo.alo"
     sender_service_name: str = "skeletor"
@@ -73,25 +59,25 @@ class SubscriberSettings(BaseModel):
     queue: QueueSettings
 
 
-class SkeletorPublishersSettings(BaseModel):
-    bones: ExchangeSettings = ExchangeSettings(name="skeletor.bones")
+class UsersPublishersSettings(BaseModel):
+    users: ExchangeSettings = ExchangeSettings(name="users")
 
 
-class SkeletorSubscribersSettings(BaseModel):
-    new_bone: SubscriberSettings = SubscriberSettings(
-        exchange=ExchangeSettings(name="skeletor.bones"),
-        queue=QueueSettings(name="skeletor.bones.event_created", routing_key="v1.event.created"),
+class UsersSubscribersSettings(BaseModel):
+    wallet_registration: SubscriberSettings = SubscriberSettings(
+        exchange=ExchangeSettings(name="users"),
+        queue=QueueSettings(name="users.registration.event_created", routing_key="v1.event.registration"),
     )
 
 
-class SkeletorVhostSettings(BaseModel):
-    url: AmqpDsnStr = "amqp://user:password@rmq:5672/skeletor"
-    publishers: SkeletorPublishersSettings = SkeletorPublishersSettings()
-    subscribers: SkeletorSubscribersSettings = SkeletorSubscribersSettings()
+class UsersVhostSettings(BaseModel):
+    url: AmqpDsnStr = "amqp://user:password@rmq:5672/users"
+    publishers: UsersPublishersSettings = UsersPublishersSettings()
+    subscribers: UsersSubscribersSettings = UsersSubscribersSettings()
 
 
 class BrokersSettings(BaseModel):
-    skeletor: SkeletorVhostSettings = SkeletorVhostSettings()
+    users: UsersVhostSettings = UsersVhostSettings()
 
 
 class DatabaseSettings(BaseModel):
@@ -115,8 +101,8 @@ class Environments(StrEnum):
     prod = "prod"
 
 
-class SentrySettings(BaseModel):
-    dsn: str = ""
+class Web3Settings(BaseModel):
+    rpc_url: str = "https://arbitrum-sepolia.infura.io/v3/2a852b2d2c174a81ac0d904de44d2aa1"
 
 
 class Config(BaseSettings):
@@ -129,10 +115,10 @@ class Config(BaseSettings):
     api: ApiSettings = ApiSettings()
     debug: bool = False
     environment: Environments = Environments.local
-    metrics_server: MetricsServerSettings = MetricsServerSettings()
-    sentry: SentrySettings = SentrySettings()
     version: str = "local"
 
     db: DatabaseSettings = DatabaseSettings()
     clients: ClientsSettings = ClientsSettings()
     brokers: BrokersSettings = BrokersSettings()
+    web3: Web3Settings = Web3Settings()
+    master_key: bytes = b"89w8fiuwupn3ux6vuedcfdzqavr99lmn"

@@ -7,7 +7,7 @@ app = Typer()
 @app.command(help="Run local database migrations")
 def main(
     db_url: str = Argument(envvar="DB_URL"),
-    migrations_dir: str = Option(default="skeletor-db/migrations"),
+    migrations_dir: str = Option(default="users-db/migrations"),
 ) -> None:
     db = get_backend(db_url)
     migrations = read_migrations(migrations_dir)

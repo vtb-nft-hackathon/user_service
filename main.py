@@ -28,9 +28,9 @@ def run_api() -> None:
 
 
 @manager.command()
-def run_assign_large_account() -> None:
-    """Консюмер событий."""
-    from app.consumers.assign_large_account import create_subscriber
+def run_wallet_registration() -> None:
+    """User registration consumer for wallet registration"""
+    from app.consumers.wallet_creation import create_subscriber
     from app.consumers.main import start_consumer
 
     run(start_consumer(create_subscriber, config=config))
