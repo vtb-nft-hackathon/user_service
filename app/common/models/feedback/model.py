@@ -1,3 +1,5 @@
+import datetime
+
 from pydantic import BaseModel
 
 from app.common.models.job.model import JobDomain
@@ -9,6 +11,7 @@ class FeedBackBase(BaseModel):
     job_id: int
     feedback: str
     recommend: bool
+    date: datetime.date
 
 
 class FeedBackDomain(FeedBackBase):

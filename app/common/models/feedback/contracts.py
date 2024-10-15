@@ -1,3 +1,5 @@
+import datetime
+
 from pydantic import BaseModel
 
 from app.common.models.job.contracts import JobResponse
@@ -8,3 +10,4 @@ class FeedBackResponse(BaseModel):
     recommend: bool
     author: UserInfoResponseSlim
     job: JobResponse
+    date: datetime.date
